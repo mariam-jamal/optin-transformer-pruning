@@ -16,10 +16,6 @@ def mac_per_neuron(seq_len, hidden_size):
     return 2 * seq_len * hidden_size
 
 
-
-
-
-
 def compute_mac(
     head_mask,
     neuron_mask,

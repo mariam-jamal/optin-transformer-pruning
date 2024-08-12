@@ -1,5 +1,7 @@
 from utils.utility import GLUE_TASKS
 from evals.language.eval_glue import eval_glue_acc
+from evals.vision.eval_imagenet import eval_imagenet_acc
+from evals.vision.vision_ftune import train_acc
 
 def evalModel(args, model, train_dataset, val_dataset, pruningParams, prunedProps):
     
@@ -9,8 +11,7 @@ def evalModel(args, model, train_dataset, val_dataset, pruningParams, prunedProp
         
         if "seg" in args.model_name: # Segmentation Model
             print("Segmentation Model")
-            # baselinePerformance, finalPerformance = reRouteSegment(args, model, train_dataset, val_dataset, pruningParams, prunedProps)
-        
+            
         if args.fine_tune == True: # Transfer Learning on CIFAR10 & 100 
             finalPerformance = train_acc(args, model, pruningParams=pruningParams)
         
@@ -24,6 +25,9 @@ def evalModel(args, model, train_dataset, val_dataset, pruningParams, prunedProp
             finalPerformance = eval_glue_acc(args, model, val_dataset, args.dataset, pruningParams=pruningParams, prunedProps=prunedProps)
             
     return None, finalPerformance
+
+
+
 
     
     

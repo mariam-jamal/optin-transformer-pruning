@@ -252,9 +252,7 @@ class ModelHooking():
         count = 0
         for name, module in self.model.named_modules():
             if "mlp.fc1" in name:
-                print("Applied")
                 mask = self.evalProps["neuron_mask"][count]
-                # hook = lambda _, inputs, outputs: (outputs[0]*mask.cuda(),) #32x77x3072
                 hookHandle = module.register_forward_hook(self.hookHere(name, mask))
                 hooksHandler.append(hookHandle)
                 count+=1
@@ -322,16 +320,11 @@ class ModelHooking():
             if ((self.args.task_name == "vision" or (self.args.task_name == "fusion" and "visual" in self.maskProps["fusion_component"]) )and self.args.embedding_choice in name and 'attention' not in name) \
                 or ((self.args.task_name == "language" or (self.args.task_name == "fusion" and "text" in self.maskProps["fusion_component"])) and 'output' in name and 'dense' in name and 'attention' not in name) \
                     or (self.args.task_name == "LLM"  and ".mlp.c_fc" in name):
-                    
-            # if (self.args.task_name == "vision" and 'layernorm_after' in name and 'attention' not in name) \
-                # or (self.args.task_name == "language" and 'output' in name and 'LayerNorm' in name and 'attention' not in name):
                 
                 hookHandle = module.register_forward_hook(self.record_layer_output(name))
                 self.layer_hooks.append(hookHandle)
                   
     def forwardPass(self,batch):
-        
-        # print(batch)
         
         if self.head_mask is not None:
             with torch.no_grad():

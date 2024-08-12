@@ -11,13 +11,13 @@ from datetime import datetime
 import json
 from transformers import set_seed
 from tqdm import tqdm
-import timm
+# import timm
 
 
 from data.scripts.gen_dataset import generateDataset
 from models.scripts.gen_model import generateModel
 from prune.main_prune import pruneModel
-from utils.utility import calculateComplexity
+
 from data.scripts.glue import avg_seq_length
 
 from evals.gen_eval import evalModel
@@ -80,25 +80,17 @@ def main():
        "patch_size": seq_len+1
     }
     
-    print(prunedProps)
     pruningParams = {
        "head_mask": torch.ones((prunedProps["num_layers"], prunedProps["num_att_head"])),
        "neuron_mask": torch.ones((prunedProps["num_layers"], prunedProps["inter_size"])),
        "patch_mask": torch.ones((prunedProps["num_layers"], int(seq_len+1)))
     }
     
-    baselineComplexity, prunedComplexity = calculateComplexity(args, model, train_dataset, prunedProps, pruningParams)
-    
-    print("BASELINE COMPLEXITY: ", baselineComplexity, "PRUNED COMPLEXITY: ", prunedComplexity)
-    
-    pruningParams = pruneModel(args, model, train_dataset, model_config)
-    
-    baselineComplexity, prunedComplexity = calculateComplexity(args, model, train_dataset, prunedProps, pruningParams)
-    
+    pruningParams,baselineComplexity,prunedComplexity = pruneModel(args, model, train_dataset, model_config)
         
     print("BASELINE COMPLEXITY: ", baselineComplexity, "PRUNED COMPLEXITY: ", prunedComplexity)
     
-    flopReductionAmmount = 100-(prunedComplexity["MAC"]/ baselineComplexity["MAC"] * 100.0)
+    flopReductionAmmount = 100-(prunedComplexity/ baselineComplexity * 100.0)
 
     print("FLOP Reduction by:{}".format(flopReductionAmmount))
     
@@ -117,31 +109,31 @@ def main():
     
     baselineMetrics = {
         "Baseline":{
-            "Baseline-MAC": baselineComplexity["MAC"],
-            "Baseline-Latency":baselineComplexity["Latency"]
+            "Baseline-MAC": baselineComplexity,
+            "Baseline-Latency":None
         }
     }
     write_json(baselineMetrics, path,args)
     
     prunedMetrics = {
         "Pruned":{
-            "Pruned-MAC": prunedComplexity["MAC"],
-            "Pruned-Latency":prunedComplexity["Latency"]
+            "Pruned-MAC": prunedComplexity,
+            "Pruned-Latency":None
         }
     }
     write_json(prunedMetrics, path, args)
     
     finalMetrics = {
         "Final":{
-            "MAC": prunedComplexity["MAC"] / baselineComplexity["MAC"] * 100.0,
-            "Latency":prunedComplexity["Latency"] / baselineComplexity["Latency"] * 100.0
+            "MAC": prunedComplexity / baselineComplexity * 100.0,
+            "Latency":None
         }    
     }
     write_json(finalMetrics, path, args)
     
     print("Orig Model Perf:{}, Pruned Model Perf: {}".format(baselinePerformance, finalPerformance))
-    print("FLOP Reduction by::{}".format(100-(prunedComplexity["MAC"]/ baselineComplexity["MAC"] * 100.0)))
-    print("FLOP Percentage :{}".format(prunedComplexity["MAC"]/ baselineComplexity["MAC"] * 100.0))
+    print("FLOP Reduction by::{}".format(100-(prunedComplexity/ baselineComplexity* 100.0)))
+    print("FLOP Percentage :{}".format(prunedComplexity/ baselineComplexity * 100.0))
     
     
     return

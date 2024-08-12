@@ -6,9 +6,9 @@ from transformers import AutoTokenizer
 from utils.utility import GLUE_TASKS
 
 # Vision
-# from data.scripts.cifar import cifar10Dataset, cifar100Dataset
-# from data.scripts.imagenet import imageNetDataset
-# from data.scripts.cityscapes import cityscapesDataset
+from data.scripts.cifar import cifar10Dataset, cifar100Dataset
+from data.scripts.imagenet import imageNetDataset
+from data.scripts.cityscapes import cityscapesDataset
 
 from datasets import load_dataset
 
