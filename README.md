@@ -12,7 +12,7 @@
 
 ## News
 - [2024/08/11] Initial Codebase for Vision Experiments has been released, and parameter save has been released on our HuggingFace page.
-- [2024/04/08] Initial Codebase for Language Experiments has been released; More coming soon!
+- [2024/04/08] Initial Codebase for Language Experiments has been released.
 - [2024/01/16] OPTIN Transformer Pruning is accepted at ICLR 2024
 
 ## Abstract
