@@ -6,6 +6,7 @@ import evaluate
 from utils._hooks import ModelHooking
 from data.scripts.glue import target_dev_metric
 import timm
+import tome
 
 @torch.no_grad()
 def eval_imagenet_acc(args, model, val_dataloader, task_name, pruningParams=None):
@@ -18,7 +19,15 @@ def eval_imagenet_acc(args, model, val_dataloader, task_name, pruningParams=None
     
     
     name = (args.model_name).replace("-", "_")
+    
     model = timm.create_model(name, pretrained=True).cuda()
+    
+    #* Implement ToME patch to support token merging @ ToME implementation: Bolya et al. 2023
+    #* Note: As stated in the main paper, any other merging implementation can be used as well, simply apply our searched reduction strategy.
+    
+    tome.patch.timm(model)
+    print(modPatch)
+    model.r = modPatch
     
     metric = evaluate.load("accuracy")
 
