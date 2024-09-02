@@ -23,12 +23,13 @@ def eval_imagenet_acc(args, model, val_dataloader, task_name, pruningParams=None
     model = timm.create_model(name, pretrained=True).cuda()
     
     #* Implement ToME patch to support token merging @ ToME implementation: Bolya et al. 2023
-    #* Note: As stated in the main paper, any other merging implementation can be used as well, simply apply our searched reduction strategy.
+    #* Note: As stated in the main paper, any other token pruning/merging implementation can be used as well, simply apply our searched reduction strategy.
     
-    tome.patch.timm(model)
-    print(modPatch)
-    model.r = modPatch
-    
+    if sum(modPatch) > 0:
+        print(modPatch, sum(modPatch))
+        tome.patch.timm(model)
+        model.r = modPatch
+
     metric = evaluate.load("accuracy")
 
     print([i.sum() for i in pruningParams["patch_mask"]])
