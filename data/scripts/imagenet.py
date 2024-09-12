@@ -23,8 +23,8 @@ def queryImageNetDataSets(args):
          T.ToTensor(),
          T.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)])
 
-   train_dataset = ImageFolder("/nobackup1/ImageNet/train", transform=transform)
-   val_dataset = ImageFolder("/nobackup1/ImageNet/val", transform=transform)
+   train_dataset = ImageFolder("/aidata/imagenet1k/train/", transform=transform)
+   val_dataset = ImageFolder("/aidata/imagenet1k/val/", transform=transform)
    return train_dataset, val_dataset
  
  
